@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Panel - Quizonix</title>
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <a class="brand" href="/admin.html">Quizonix</a>
+    <div class="nav-links" id="nav-links"></div>
+  </nav>
+
+  <div class="container wide">
+    <div class="card">
+      <h1>Create a Quiz from a PPT</h1>
+      <p class="subtitle">Upload a PowerPoint, describe what you want, and AI will generate the MCQs.</p>
+
+      <label>Quiz title</label>
+      <input type="text" id="title" placeholder="e.g. Data Structures - Trees" />
+
+      <label>Unit / topic name</label>
+      <input type="text" id="unit" placeholder="e.g. Unit 3" />
+
+      <label>Upload PPT (.ppt or .pptx)</label>
+      <input type="file" id="ppt" accept=".ppt,.pptx" />
+
+      <label>Prompt for the AI (optional)</label>
+      <textarea id="prompt" placeholder="e.g. Focus more on definitions and real-world examples. Keep the language simple."></textarea>
+
+      <label>Number of questions</label>
+      <input type="number" id="numQuestions" value="30" min="5" max="50" />
+
+      <label>Time limit (minutes)</label>
+      <input type="number" id="durationMinutes" value="45" min="5" max="240" />
+
+      <button class="btn" id="generate-btn">Generate Quiz with AI</button>
+      <div class="error" id="error"></div>
+      <div class="success" id="success"></div>
+    </div>
+
+    <div class="card">
+      <h2>Your Quizzes</h2>
+      <div id="quiz-table"><p class="muted">Loading...</p></div>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    async function loadQuizzes() {
+      const wrap = document.getElementById('quiz-table');
+      const { quizzes } = await api('/admin/quizzes');
+      if (!quizzes.length) {
+        wrap.innerHTML = '<p class="muted">No quizzes created yet.</p>';
+        return;
+      }
+      wrap.innerHTML = `
+        <table>
+          <thead><tr><th>Title</th><th>Unit</th><th>Questions</th><th>Duration</th><th>Attempts</th><th></th></tr></thead>
+          <tbody>
+            ${quizzes.map(q => `
+              <tr>
+                <td>${q.title}</td>
+                <td>${q.unit || '-'}</td>
+                <td>${q.total_questions}</td>
+                <td>${q.duration_minutes} min</td>
+                <td>${q.attempts_count}</td>
+                <td><button class="btn danger" data-id="${q.id}" style="margin:0;padding:6px 14px">Delete</button></td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+      wrap.querySelectorAll('button[data-id]').forEach(btn => {
+        btn.onclick = async () => {
+          if (!confirm('Delete this quiz and all its attempts?')) return;
+          await api('/admin/quizzes/' + btn.dataset.id, { method: 'DELETE' });
+          loadQuizzes();
+        };
+      });
+    }
+
+    document.getElementById('generate-btn').onclick = async () => {
+      const errorEl = document.getElementById('error');
+      const successEl = document.getElementById('success');
+      errorEl.textContent = '';
+      successEl.textContent = '';
+
+      const pptFile = document.getElementById('ppt').files[0];
+      const title = document.getElementById('title').value.trim();
+      if (!title) { errorEl.textContent = 'Please enter a quiz title.'; return; }
+      if (!pptFile) { errorEl.textContent = 'Please choose a PPT file.'; return; }
+
+      const btn = document.getElementById('generate-btn');
+      btn.disabled = true;
+      btn.textContent = 'Generating with AI... this can take up to a minute';
+
+      const fd = new FormData();
+      fd.append('ppt', pptFile);
+      fd.append('title', title);
+      fd.append('unit', document.getElementById('unit').value.trim());
+      fd.append('prompt', document.getElementById('prompt').value.trim());
+      fd.append('numQuestions', document.getElementById('numQuestions').value);
+      fd.append('durationMinutes', document.getElementById('durationMinutes').value);
+
+      try {
+        const result = await api('/admin/quizzes', { method: 'POST', body: fd });
+        successEl.textContent = `Quiz created with ${result.questionsGenerated} questions!`;
+        document.getElementById('title').value = '';
+        document.getElementById('unit').value = '';
+        document.getElementById('prompt').value = '';
+        document.getElementById('ppt').value = '';
+        loadQuizzes();
+      } catch (e) {
+        errorEl.textContent = e.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Generate Quiz with AI';
+      }
+    };
+
+    (async () => {
+      const user = await requireLogin('admin');
+      if (!user) return;
+      loadQuizzes();
+    })();
+  </script>
+</body>
+</html>

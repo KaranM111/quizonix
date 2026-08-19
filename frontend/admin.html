@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Quizonix | Admin Dashboard</title>
+
+    <link rel="stylesheet" href="css/admin.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://kit.fontawesome.com/6b4d3cb5f3.js" crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+
+<div class="admin-container">
+
+<aside class="sidebar">
+
+<div class="logo">
+
+<h2>Quizonix</h2>
+
+</div>
+
+<ul>
+
+<li class="active">
+
+<i class="fa-solid fa-chart-line"></i>
+
+<span>Dashboard</span>
+
+</li>
+
+<li>
+
+<i class="fa-solid fa-layer-group"></i>
+
+<span>Units</span>
+
+</li>
+
+<li>
+
+<i class="fa-solid fa-book-open"></i>
+
+<span>Subjects</span>
+
+</li>
+
+<li>
+
+<i class="fa-solid fa-file-powerpoint"></i>
+
+<span>Upload PPT</span>
+
+</li>
+
+<li>
+
+<i class="fa-solid fa-robot"></i>
+
+<span>Generate MCQs</span>
+
+</li>
+
+<li>
+
+<i class="fa-solid fa-list-check"></i>
+
+<span>Question Bank</span>
+
+</li>
+
+<li>
+
+<i class="fa-solid fa-ranking-star"></i>
+
+<span>Leaderboard</span>
+
+</li>
+
+<li>
+
+<i class="fa-solid fa-users"></i>
+
+<span>Students</span>
+
+</li>
+
+<li>
+
+<i class="fa-solid fa-chart-column"></i>
+
+<span>Analytics</span>
+
+</li>
+
+<li>
+
+<i class="fa-solid fa-gear"></i>
+
+<span>Settings</span>
+
+</li>
+
+<li>
+
+<i class="fa-solid fa-right-from-bracket"></i>
+
+<span>Logout</span>
+
+</li>
+
+</ul>
+
+</aside>
+
+<main class="content">
+
+<div class="topbar">
+
+<div>
+
+<h1>Admin Dashboard</h1>
+
+<p>Manage Units, Subjects and AI Generated Tests</p>
+
+</div>
+
+<div class="admin-profile">
+
+<h3>Welcome Admin 👋</h3>
+
+</div>
+
+</div>
+
+<div class="cards">
+
+<div class="card">
+
+<i class="fa-solid fa-layer-group"></i>
+
+<h2>Total Units</h2>
+
+<h1>04</h1>
+
+</div>
+
+<div class="card">
+
+<i class="fa-solid fa-book"></i>
+
+<h2>Total Subjects</h2>
+
+<h1>12</h1>
+
+</div>
+
+<div class="card">
+
+<i class="fa-solid fa-list"></i>
+
+<h2>Total MCQs</h2>
+
+<h1>628</h1>
+
+</div>
+
+<div class="card">
+
+<i class="fa-solid fa-user-graduate"></i>
+
+<h2>Total Students</h2>
+
+<h1>14</h1>
+
+</div>
+
+</div>
+
+<div class="dashboard-grid">
+
+<div class="panel">
+
+<h2>Create New Unit</h2>
+
+<input type="text" placeholder="Enter Unit Name">
+
+<button>Create Unit</button>
+
+</div>
+
+<div class="panel">
+
+<h2>Create Subject</h2>
+
+<select>
+
+<option>Select Unit</option>
+
+<option>Unit 1</option>
+
+<option>Unit 2</option>
+
+<option>Unit 3</option>
+
+<option>Unit 4</option>
+
+</select>
+
+<input type="text" placeholder="Enter Subject Name">
+
+<button>Create Subject</button>
+
+</div>
+
+<div class="panel">
+
+<h2>Upload PPT</h2>
+
+<select>
+
+<option>Select Unit</option>
+
+<option>Unit 1</option>
+
+<option>Unit 2</option>
+
+<option>Unit 3</option>
+
+<option>Unit 4</option>
+
+</select>
+
+<select>
+
+<option>Select Subject</option>
+
+<option>Java</option>
+
+<option>PHP</option>
+
+<option>DBMS</option>
+
+<option>DSA</option>
+
+<option>Operating System</option>
+
+</select>
+
+<div class="file-upload">
+
+<i class="fa-solid fa-file-arrow-up"></i>
+
+<h3>Upload PowerPoint</h3>
+
+<p>Drag & Drop or Click Here</p>
+
+<input type="file">
+
+</div>
+
+<textarea placeholder="Enter AI Prompt...
+
+Example:
+Generate 100 difficult MCQs.
+Avoid repeated questions.
+Include scenario-based questions.
+Give 4 options and one correct answer.
+Difficulty: Medium to Hard."></textarea>
+
+<button>
+
+Generate MCQs
+
+</button>
+
+<div class="progress">
+
+<div class="progress-bar"></div>
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>Quick Statistics</h2>
+
+<table class="table">
+
+<tr>
+
+<th>Category</th>
+
+<th>Count</th>
+
+</tr>
+
+<tr>
+
+<td>Published Tests</td>
+
+<td>18</td>
+
+</tr>
+
+<tr>
+
+<td>Pending PPTs</td>
+
+<td>3</td>
+
+</tr>
+
+<tr>
+
+<td>Generated MCQs</td>
+
+<td>628</td>
+
+</tr>
+
+<tr>
+
+<td>Leaderboard Entries</td>
+
+<td>147</td>
+
+</tr>
+
+<tr>
+
+<td>Completed Tests</td>
+
+<td>94</td>
+
+</tr>
+
+</table>
+
+</div>
+
+</div>
+
+<div class="table-container">
+
+<div class="table-header">
+
+<h2>Recent Uploads</h2>
+
+<button class="action-btn edit-btn">
+
+View All
+
+</button>
+
+</div>
+
+<table class="table">
+
+<thead>
+
+<tr>
+
+<th>Unit</th>
+
+<th>Subject</th>
+
+<th>PPT</th>
+
+<th>MCQs</th>
+
+<th>Status</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td>Unit 1</td>
+
+<td>Java</td>
+
+<td>java_intro.pptx</td>
+
+<td>100</td>
+
+<td>
+
+<span class="badge success">
+
+Completed
+
+</span>
+
+</td>
+
+<td>
+
+<button class="action-btn edit-btn">
+
+Edit
+
+</button>
+
+<button class="action-btn delete-btn">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>Unit 2</td>
+
+<td>DBMS</td>
+
+<td>dbms_unit2.pptx</td>
+
+<td>75</td>
+
+<td>
+
+<span class="badge warning">
+
+Processing
+
+</span>
+
+</td>
+
+<td>
+
+<button class="action-btn edit-btn">
+
+Edit
+
+</button>
+
+<button class="action-btn delete-btn">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>Unit 3</td>
+
+<td>PHP</td>
+
+<td>php_forms.pptx</td>
+
+<td>120</td>
+
+<td>
+
+<span class="badge success">
+
+Completed
+
+</span>
+
+</td>
+
+<td>
+
+<button class="action-btn edit-btn">
+
+Edit
+
+</button>
+
+<button class="action-btn delete-btn">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>Unit 4</td>
+
+<td>Operating System</td>
+
+<td>memory_management.pptx</td>
+
+<td>95</td>
+
+<td>
+
+<span class="badge danger">
+
+Pending
+
+</span>
+
+</td>
+
+<td>
+
+<button class="action-btn edit-btn">
+
+Edit
+
+</button>
+
+<button class="action-btn delete-btn">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>Unit 2</td>
+
+<td>DSA</td>
+
+<td>stack_queue.pptx</td>
+
+<td>110</td>
+
+<td>
+
+<span class="badge success">
+
+Completed
+
+</span>
+
+</td>
+
+<td>
+
+<button class="action-btn edit-btn">
+
+Edit</button>
+
+<button class="action-btn delete-btn">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</main>
+
+</div>
+
+<script src="js/admin.js"></script>
+
+</body>
+
+</html>

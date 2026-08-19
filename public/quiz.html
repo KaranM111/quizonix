@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Take Quiz - Quizonix</title>
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <a class="brand" href="/index.html">Quizonix</a>
+    <div class="nav-links" id="nav-links"></div>
+  </nav>
+
+  <div class="container wide">
+    <div class="card" id="quiz-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <h1 id="quiz-title">Loading quiz...</h1>
+          <p class="subtitle" id="quiz-meta"></p>
+        </div>
+        <div class="timer" id="timer">--:--</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+      <div id="questions"></div>
+      <button class="btn" id="submit-btn">Submit Test</button>
+      <div class="error" id="error"></div>
+    </div>
+
+    <div class="card" id="result-card" style="display:none">
+      <h1>Test submitted!</h1>
+      <p id="result-text" style="font-size:20px"></p>
+      <a class="btn" href="/index.html">Back to quizzes</a>
+      <a class="btn secondary" href="/leaderboard.html">View leaderboard</a>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const quizId = params.get('id');
+    let quiz, questions, timerInterval, secondsLeft, startedAt;
+    let submitted = false;
+
+    function formatTime(s) {
+      const m = Math.floor(s / 60).toString().padStart(2, '0');
+      const sec = (s % 60).toString().padStart(2, '0');
+      return `${m}:${sec}`;
+    }
+
+    function updateProgress() {
+      const answered = document.querySelectorAll('.options input:checked').length;
+      const pct = Math.round((answered / questions.length) * 100);
+      document.getElementById('progress').style.width = pct + '%';
+    }
+
+    async function submitTest(auto) {
+      if (submitted) return;
+      submitted = true;
+      clearInterval(timerInterval);
+
+      const answers = {};
+      questions.forEach(q => {
+        const chosen = document.querySelector(`input[name="q${q.id}"]:checked`);
+        if (chosen) answers[q.id] = chosen.value;
+      });
+
+      const timeTakenSeconds = Math.round((Date.now() - startedAt) / 1000);
+
+      try {
+        const result = await api(`/quiz/${quizId}/submit`, {
+          method: 'POST',
+          body: { answers, timeTakenSeconds }
+        });
+        document.getElementById('quiz-card').style.display = 'none';
+        document.getElementById('result-card').style.display = 'block';
+        document.getElementById('result-text').textContent =
+          (auto ? "Time's up! " : "") + `You scored ${result.score} out of ${result.total}.`;
+      } catch (e) {
+        document.getElementById('error').textContent = e.message;
+      }
+    }
+
+    function startTimer(durationMinutes) {
+      secondsLeft = durationMinutes * 60;
+      const timerEl = document.getElementById('timer');
+      timerEl.textContent = formatTime(secondsLeft);
+      timerInterval = setInterval(() => {
+        secondsLeft--;
+        timerEl.textContent = formatTime(secondsLeft);
+        if (secondsLeft <= 60) timerEl.style.background = 'rgba(255,92,122,0.35)';
+        if (secondsLeft <= 0) {
+          submitTest(true);
+        }
+      }, 1000);
+    }
+
+    (async () => {
+      const user = await requireLogin();
+      if (!user) return;
+
+      try {
+        const data = await api('/quiz/' + quizId);
+        quiz = data.quiz;
+        questions = data.questions;
+
+        document.getElementById('quiz-title').textContent = quiz.title;
+        document.getElementById('quiz-meta').textContent =
+          `${quiz.unit ? 'Unit: ' + quiz.unit + ' · ' : ''}${questions.length} MCQs · ${quiz.duration_minutes} minutes`;
+
+        document.getElementById('questions').innerHTML = questions.map((q, i) => `
+          <div class="question-block">
+            <div class="q-title">${i + 1}. ${q.question_text}</div>
+            <div class="options">
+              ${['A','B','C','D'].map(letter => `
+                <label class="option-row">
+                  <input type="radio" name="q${q.id}" value="${letter}" />
+                  <span>${letter}. ${q['option_' + letter.toLowerCase()]}</span>
+                </label>`).join('')}
+            </div>
+          </div>`).join('');
+
+        document.querySelectorAll('.options input').forEach(inp => inp.addEventListener('change', updateProgress));
+
+        document.getElementById('submit-btn').onclick = () => {
+          if (confirm('Submit your test now? You cannot change answers after this.')) submitTest(false);
+        };
+
+        startedAt = Date.now();
+        startTimer(quiz.duration_minutes);
+      } catch (e) {
+        document.getElementById('quiz-card').innerHTML = `<p class="error">${e.message}</p><a class="btn" href="/index.html">Back</a>`;
+      }
+    })();
+  </script>
+</body>
+</html>

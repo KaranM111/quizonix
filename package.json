@@ -1,0 +1,24 @@
+{
+  "name": "quizonix",
+  "version": "1.0.0",
+  "description": "Quizonix - AI-powered MCQ quiz platform from PPT uploads",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "initdb": "node db.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.0",
+    "officeparser": "^4.1.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

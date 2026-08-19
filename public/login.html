@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Login - Quizonix</title>
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <a class="brand" href="/index.html">Quizonix</a>
+    <div class="nav-links" id="nav-links"></div>
+  </nav>
+
+  <div class="container">
+    <div class="card">
+      <h1>Welcome back</h1>
+      <p class="subtitle">Log in to take your quiz or manage the platform.</p>
+
+      <label>Email</label>
+      <input type="email" id="email" placeholder="you@example.com" />
+
+      <label>Password</label>
+      <input type="password" id="password" placeholder="Your password" />
+
+      <button class="btn" id="login-btn" style="width:100%">Log in</button>
+      <div class="error" id="error"></div>
+      <p class="muted">No account yet? <a class="link" href="/register.html">Register here</a></p>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    document.getElementById('login-btn').onclick = async () => {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const errorEl = document.getElementById('error');
+      errorEl.textContent = '';
+      try {
+        const { user } = await api('/auth/login', { method: 'POST', body: { email, password } });
+        window.location.href = user.role === 'admin' ? '/admin.html' : '/index.html';
+      } catch (e) {
+        errorEl.textContent = e.message;
+      }
+    };
+
+    (async () => {
+      const user = await getCurrentUser();
+      renderNav(user);
+    })();
+  </script>
+</body>
+</html>

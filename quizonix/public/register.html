@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Register - Quizonix</title>
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <a class="brand" href="/index.html">Quizonix</a>
+    <div class="nav-links" id="nav-links"></div>
+  </nav>
+
+  <div class="container">
+    <div class="card">
+      <h1>Create your account</h1>
+      <p class="subtitle">Register as a student to take quizzes, or as an admin to create them.</p>
+
+      <div class="role-toggle">
+        <label><input type="radio" name="role" value="user" checked /><span>👤 Student</span></label>
+        <label><input type="radio" name="role" value="admin" /><span>🛠 Admin</span></label>
+      </div>
+
+      <label>Full name</label>
+      <input type="text" id="name" placeholder="Jane Doe" />
+
+      <label>Email</label>
+      <input type="email" id="email" placeholder="you@example.com" />
+
+      <label>Password</label>
+      <input type="password" id="password" placeholder="At least 6 characters" />
+
+      <div id="admin-secret-wrap" style="display:none">
+        <label>Admin signup code</label>
+        <input type="password" id="adminSecret" placeholder="Ask your site owner for this code" />
+      </div>
+
+      <button class="btn" id="register-btn" style="width:100%">Create account</button>
+      <div class="error" id="error"></div>
+      <p class="muted">Already have an account? <a class="link" href="/login.html">Log in</a></p>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    document.querySelectorAll('input[name=role]').forEach(r => {
+      r.addEventListener('change', () => {
+        document.getElementById('admin-secret-wrap').style.display =
+          document.querySelector('input[name=role]:checked').value === 'admin' ? 'block' : 'none';
+      });
+    });
+
+    document.getElementById('register-btn').onclick = async () => {
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const role = document.querySelector('input[name=role]:checked').value;
+      const adminSecret = document.getElementById('adminSecret').value;
+      const errorEl = document.getElementById('error');
+      errorEl.textContent = '';
+
+      try {
+        const { user } = await api('/auth/register', { method: 'POST', body: { name, email, password, role, adminSecret } });
+        window.location.href = user.role === 'admin' ? '/admin.html' : '/index.html';
+      } catch (e) {
+        errorEl.textContent = e.message;
+      }
+    };
+
+    (async () => {
+      const user = await getCurrentUser();
+      renderNav(user);
+    })();
+  </script>
+</body>
+</html>

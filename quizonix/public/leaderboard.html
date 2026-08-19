@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Leaderboard - Quizonix</title>
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <a class="brand" href="/index.html">Quizonix</a>
+    <div class="nav-links" id="nav-links"></div>
+  </nav>
+
+  <div class="container wide">
+    <div class="card">
+      <h1>Leaderboard</h1>
+      <p class="subtitle">See rankings overall, by unit, or for a specific PPT/quiz.</p>
+
+      <label>Filter by</label>
+      <select id="filter-type">
+        <option value="overall">Overall (all quizzes combined)</option>
+        <option value="unit">By Unit</option>
+        <option value="quiz">By specific Quiz / PPT</option>
+      </select>
+
+      <div id="unit-wrap" style="display:none">
+        <label>Unit</label>
+        <select id="unit-select"></select>
+      </div>
+      <div id="quiz-wrap" style="display:none">
+        <label>Quiz</label>
+        <select id="quiz-select"></select>
+      </div>
+
+      <button class="btn" id="load-btn">Show Leaderboard</button>
+    </div>
+
+    <div class="card">
+      <div id="board"><p class="muted">Choose a filter above and click "Show Leaderboard".</p></div>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    let me, allQuizzes = [];
+
+    document.getElementById('filter-type').addEventListener('change', (e) => {
+      document.getElementById('unit-wrap').style.display = e.target.value === 'unit' ? 'block' : 'none';
+      document.getElementById('quiz-wrap').style.display = e.target.value === 'quiz' ? 'block' : 'none';
+    });
+
+    async function loadFilters() {
+      const { quizzes } = await api('/leaderboard/quizzes');
+      allQuizzes = quizzes;
+      const units = [...new Set(quizzes.map(q => q.unit).filter(Boolean))];
+      document.getElementById('unit-select').innerHTML = units.map(u => `<option value="${u}">${u}</option>`).join('');
+      document.getElementById('quiz-select').innerHTML = quizzes.map(q => `<option value="${q.id}">${q.title}${q.unit ? ' (' + q.unit + ')' : ''}</option>`).join('');
+    }
+
+    function renderBoard(rows, hasTotals) {
+      const board = document.getElementById('board');
+      if (!rows.length) {
+        board.innerHTML = '<p class="muted">No attempts yet.</p>';
+        return;
+      }
+      board.innerHTML = `
+        <table>
+          <thead><tr><th>#</th><th>Name</th><th>Score</th>${hasTotals ? '<th>Quizzes Taken</th>' : ''}<th>Time Taken</th></tr></thead>
+          <tbody>
+            ${rows.map((r, i) => `
+              <tr class="${me && r.email === me.email ? 'me' : ''}">
+                <td>${i + 1}</td>
+                <td>${r.name}</td>
+                <td>${r.score} / ${r.total_questions}</td>
+                ${hasTotals ? `<td>${r.quizzes_taken || 1}</td>` : ''}
+                <td>${Math.round((r.time_taken_seconds || 0) / 60)} min</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    document.getElementById('load-btn').onclick = async () => {
+      const type = document.getElementById('filter-type').value;
+      let query = '';
+      let hasTotals = true;
+      if (type === 'unit') query = '?unit=' + encodeURIComponent(document.getElementById('unit-select').value);
+      if (type === 'quiz') { query = '?quizId=' + document.getElementById('quiz-select').value; hasTotals = false; }
+      const { leaderboard } = await api('/leaderboard' + query);
+      renderBoard(leaderboard, hasTotals);
+    };
+
+    (async () => {
+      me = await requireLogin();
+      if (!me) return;
+      await loadFilters();
+    })();
+  </script>
+</body>
+</html>
